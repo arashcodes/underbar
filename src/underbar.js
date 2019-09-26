@@ -207,12 +207,42 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if(!iterator){
+    for (let i = 0; i < collection.length; i++) {
+      if (!collection[i]) {
+        return false
+      }
+    }
+    return true;
+    } else {
+    for (let i = 0; i < collection.length; i++) {
+      if (!iterator(collection[i])) {
+        return false
+      }
+    }
+    return true;
+    }
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if(!iterator){
+      for (let i = 0; i < collection.length; i++) {
+        if (collection[i]) {
+          return true
+        }
+      }
+      return false;
+      } else {
+      for (let i = 0; i < collection.length; i++) {
+        if (iterator(collection[i])) {
+          return true
+        }
+      }
+      return false;
+      }
   };
 
 
@@ -235,11 +265,29 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    let inputs = arguments;
+    for (let i = 1; i < inputs.length; i++){
+      for (var key in inputs[i]){
+        obj[key] = inputs[i][key];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+
+    let inputs = arguments;
+
+    for (let i = 0; i < inputs.length; i++) {
+      for (let key in inputs[i]) {
+        if (obj[key] === undefined) {
+          obj[key] = inputs[i][key];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -283,6 +331,14 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    let storeObj = {};
+    return function() {
+      let args = JSON.stringify(arguments);
+      if (!storeObj.hasOwnProperty(args)) {
+        storeObj[args] = func.apply(this, arguments);
+      }
+      return storeObj[args];
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -292,6 +348,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    let args = [...arguments].slice(2);
+    setTimeout(function() {
+      return func.apply(this, args);
+    }, wait)
   };
 
 
@@ -306,6 +366,20 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    let output = [];
+    let sortingArray = array.slice();
+
+    let getRandNum = function(max) {
+      return Math.round(Math.random() * max);
+    }
+
+    for (let i = 0; i < array.length; i++) {
+      let randNum = getRandNum(sortingArray.length-1);
+      output.push(sortingArray[randNum]);
+      sortingArray.splice(randNum, 1);
+    }
+
+    return output;
   };
 
 
